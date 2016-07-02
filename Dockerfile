@@ -1,4 +1,4 @@
-FROM finalduty/docker-archlinux-base
+FROM finalduty/archlinux
 MAINTAINER Andy Dustin <andy.dustin@gmail.com>
 WORKDIR /git/
 CMD /git/api.py
