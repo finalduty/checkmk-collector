@@ -4,7 +4,7 @@
 import argparse, requests
 from base64 import b64decode
 
-api_base_url = 'http://127.0.0.1/collector/api/v0.1/hosts/'
+api_base_url = 'http://127.0.0.1:8080/collector/api/v0.1/hosts'
 
 def main():
     ## Parse CommandLine arguments
@@ -21,13 +21,12 @@ def main():
 
 
 def get_status(hostname):
-    r = requests.get(api_base_url + hostname)
+    r = requests.get(api_base_url + '/' + hostname)
     
-    data = r.json()['host']
-        
     if r.status_code == 404:
         add_host(hostname)
     else:
+        data = r.json()['host']
         print_status(data)
         
     
@@ -40,7 +39,8 @@ def add_host(hostname):
     data = {}
     data['hostname'] = hostname
 
-    r = requests.put(api_base_url + hostname, json=data)
+    r = requests.post(api_base_url, json=data)
+    print r.json
     
 
 if __name__ == '__main__':
