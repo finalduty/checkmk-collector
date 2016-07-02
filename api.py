@@ -2,7 +2,7 @@
 ## Provides API for CMK Collector Service
 
 from flask import Flask, jsonify, abort, make_response, request, url_for
-from datetime import datetime
+from time import time
 
 app = Flask(__name__)
 base_url = '/collector/api/v0.1'
@@ -26,7 +26,8 @@ def error_404(error):
 @app.errorhandler(405)
 def error_405(error):
     return make_response(jsonify({
-        'error': 'Method Not Allowed'
+        'error': 'Method Not Allowed',
+        'info': "You should not use that method for this endpoint"
     }), 405)
 
 ## 422 Unprocessable Entity
@@ -37,13 +38,16 @@ def error_406(error):
         'info': 'Use PUT instead of POST'
     }), 422)
 
+
+## Initialise hosts list with dummy entry
 hosts = [
     {
-        'hostname': u'example.host',
+        'hostname': 'example.host',
         'last_updated': None,
         'status_data': None,
     }
 ]
+
 
 ## Add full URI to response
 def make_public_uri(response):
@@ -52,15 +56,23 @@ def make_public_uri(response):
     for field in response:
         if field == 'hostname':
             new_response['uri'] = url_for('get_host', hostname = response['hostname'], _external=True)
+        if field == 'last_updated':
+            if response['last_updated'] and response['status_data']:
+                new_response['status_age'] = time() - response['last_updated']
+            else:
+                new_response['status_age'] = None
+            continue
         new_response[field] = response[field]
-    
+
     return new_response
+
 
 ## GET Functions 
 ## Future updates will enforce access by slaves or admins only   
 @app.route(base_url + '/hosts', methods=['GET'])
 def get_hosts():
     return jsonify({'hosts': map(make_public_uri, hosts)})
+
 
 @app.route(base_url + '/hosts/<hostname>', methods=['GET'])
 def get_host(hostname):
@@ -70,7 +82,6 @@ def get_host(hostname):
         abort(404)
     
     return jsonify({'host': make_public_uri(host[0])})
-    
     
 
 ## PUT Functions (
@@ -92,7 +103,7 @@ def update_host_status(hostname):
         abort(400)
 
     host[0]['hostname'] = host[0]['hostname']
-    host[0]['last_updated'] = datetime.now()
+    host[0]['last_updated'] = time()
     host[0]['status_data'] = request.json.get('status_data', host[0]['status_data'])
     
     return jsonify({'host': make_public_uri(host[0])})
@@ -113,7 +124,7 @@ def add_host():
 
     host = {
         'hostname': hostname,
-        'last_updated': datetime.now(),
+        'last_updated': time(),
         'status_data': request.json.get('status_data', "")
     } 
 

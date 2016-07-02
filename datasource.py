@@ -17,30 +17,46 @@ def main():
     hostname = args.host
     
     get_status(hostname)
-    
 
 
 def get_status(hostname):
     r = requests.get(api_base_url + '/' + hostname)
     
     if r.status_code == 404:
-        add_host(hostname)
+        add_new_host(hostname)
     else:
         data = r.json()['host']
         print_status(data)
         
     
 def print_status(data):
-    status_data = b64decode(data['status_data'])
-    print status_data
-    
+    if data['status_data']:
+        ## Check that the status_data was generated within the last 120 seconds
+        if data['status_age'] < 120:
+            status_data = b64decode(data['status_data'])
+            print status_data
+            exit(0)
+        else:
+            print "status_data is out of date :("
+            exit(1)
+    else:
+        exit(1)
 
-def add_host(hostname):
+
+def add_new_host(hostname):
+    ## If CMK requests a host that doesn't exist, we create a new host entry on the API
     data = {}
     data['hostname'] = hostname
+    data['status_data'] = None
 
+    ## POST new host to API
     r = requests.post(api_base_url, json=data)
     print r.json
+    
+    if r.status_code == 200:
+        exit(0)
+    else:
+        exit(1)
     
 
 if __name__ == '__main__':

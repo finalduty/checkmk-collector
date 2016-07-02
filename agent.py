@@ -7,7 +7,7 @@ from time import sleep
 from base64 import b64encode
 from urllib import urlencode
 
-api_base_url = 'http://127.0.0.1/collector/api/v0.1/hosts/'
+api_base_url = 'http://127.0.0.1:8080/collector/api/v0.1/hosts/'
 hostname = socket.gethostname()
 
 ## If CMK Agent script doesn't exist then exit
