@@ -22,10 +22,27 @@ def main():
 
 def get_status(hostname):
     r = requests.get(api_base_url + hostname)
+    
     data = r.json()['host']
+        
+    if r.status_code == 404:
+        add_host(hostname)
+    else:
+        print_status(data)
+        
+    
+def print_status(data):
     status_data = b64decode(data['status_data'])
     print status_data
     
+
+def add_host(hostname):
+    data = {}
+    data['hostname'] = hostname
+
+    r = requests.put(api_base_url + hostname, json=data)
+    
+
 if __name__ == '__main__':
     main()
     

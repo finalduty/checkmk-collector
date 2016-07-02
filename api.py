@@ -1,4 +1,4 @@
-#!flask/bin/python
+#!virtenv/bin/python
 ## Provides API for CMK Collector Service
 
 from flask import Flask, jsonify, abort, make_response, request, url_for
@@ -71,14 +71,6 @@ def get_host(hostname):
     
     return jsonify({'host': make_public_uri(host[0])})
     
-@app.route(base_url + '/hosts/<hostname>/status_data', methods=['GET'])
-def get_host_status(hostname):
-    host = [host for host in hosts if host['hostname'] == hostname]
-    
-    if len(host) == 0:
-        abort(404)
-        
-    return jsonify({'status_data': host[0]['status_data']})
     
 
 ## PUT Functions (
@@ -108,8 +100,9 @@ def update_host_status(hostname):
     
 ## POST Functions 
 ## Future updates will enforce access by slaves or admins only
-@app.route(base_url + '/status', methods=['POST'])
+@app.route(base_url + '/hosts', methods=['POST'])
 def add_host():
+    print "POST"
     if not request.json or not 'hostname' in request.json:
         abort(400)
     hostname = request.json['hostname']
@@ -145,4 +138,4 @@ def delete_host(hostname):
     
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=80)
+    app.run(debug=True, host="0.0.0.0", port=8080)
