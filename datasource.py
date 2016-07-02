@@ -51,7 +51,7 @@ def add_new_host(hostname):
 
     ## POST new host to API
     r = requests.post(api_base_url, json=data)
-    print r.json
+    print r.json()
     
     if r.status_code == 200:
         exit(0)
