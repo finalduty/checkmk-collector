@@ -14,7 +14,7 @@ The below diagram below gives an overview of how data flows between hosts being 
 ## Check_MK API (api.py)
 This file provides the API itself. Dependencies are provided by the accompanying Python virtual environment. The API listens on TCP Port 8080.
 
-Monitoring data sent to one of the \<hostname\> endpoints is timestamped in order to prevent aged data being mistakenly used in the event that a host goes down or such. 
+Monitoring data sent to one of the "\<hostname\>" endpoints is timestamped in order to prevent aged data being mistakenly used, in the event that a host goes down or such. 
 
 **Available Endpoints:**
 
@@ -22,6 +22,7 @@ Monitoring data sent to one of the \<hostname\> endpoints is timestamped in orde
 |---|---|---|
 |/collector/api/v0.1/hosts|GET|Outputs a listing of all hosts currently stored in the API|
 |/collector/api/v0.1/hosts|POST|Used by the Datasource script to add entries for hosts to be monitored|
+|/collector/api/v0.1/hosts/\<hostname\>|GET|Retrieve information for a specific host|
 |/collector/api/v0.1/hosts/\<hostname\>|DELETE|Remove a host entry from the API|
 |/collector/api/v0.1/hosts/\<hostname\>|PUT|Used by the Push Agent to update status data in the API|
 
@@ -129,8 +130,8 @@ status_data is out of date :(
 ## Docker Container (Dockerfile)
 The API is also available as a Docker container for easy testing or deployment.
 
-To build:
-    docker build -t local/checkmk-collector -f Dockerfile .
+To build:  
+`docker build -t local/checkmk-collector -f Dockerfile .`
 
-To run:
-    docker run -it --rm -p 8080:8080 local/checkmk-collector
+To run:  
+`docker run -it --rm -p 8080:8080 local/checkmk-collector`
